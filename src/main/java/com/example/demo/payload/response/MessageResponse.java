@@ -1,7 +1,7 @@
 package com.example.demo.payload.response;
 
 public class MessageResponse {
-    private String message;
+    private final String message;
 
     public MessageResponse(String message) {
         this.message = message;
