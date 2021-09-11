@@ -9,6 +9,7 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.security.services.blueprints.IAuthenticationService;
+import com.example.demo.security.services.blueprints.ICacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,6 +42,9 @@ public class AuthenticationService implements IAuthenticationService {
     @Autowired
     PasswordEncoder encoder;
 
+    @Autowired
+    ICacheService cacheService;
+
     public JwtResponse authenticateUser(String username, String password) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -53,6 +57,8 @@ public class AuthenticationService implements IAuthenticationService {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+
+        cacheService.saveLoggedInUser(jwtToken, userRepository.findByUsername(username).get());
 
         return new JwtResponse(jwtToken,
                 userDetails.getId(),

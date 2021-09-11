@@ -7,7 +7,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.demo.models.User;
+import com.example.demo.security.services.blueprints.ICacheService;
 import com.example.demo.security.services.implementations.JwtUserDetailsService;
+import com.example.demo.security.services.implementations.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,26 +28,32 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
+    @Autowired
+    private ICacheService cacheService;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationTokenFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        try {
+         {
             String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            if (jwt != null) {
+                User user = cacheService.getLoggedInUser(jwt);
+                if (user != null) {
+                    UserDetails userDetails =  UserDetailsImpl.build(user);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.error("Cannot authenticate user");
+                }
             }
-        } catch (Exception e) {
-            logger.error("Cannot authenticate user: {0}", e);
         }
         filterChain.doFilter(request, response);
     }

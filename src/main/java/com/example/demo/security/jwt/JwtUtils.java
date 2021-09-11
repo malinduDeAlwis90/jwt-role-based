@@ -11,15 +11,14 @@ import org.springframework.stereotype.Component;
 import com.example.demo.security.services.implementations.UserDetailsImpl;
 import io.jsonwebtoken.*;
 
+import static com.example.demo.constants.GeneralConstants.JWT_EXPIRATION;
+
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
-
-    @Value("${app.jwtExpiration}")
-    private int jwtExpiration;
 
     public String generateJwtToken(Authentication authentication) {
 
@@ -28,7 +27,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpiration))
+                .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
