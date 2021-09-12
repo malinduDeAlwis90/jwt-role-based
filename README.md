@@ -1,5 +1,24 @@
-# jwt-role-based
-Spring Boot project to demonstrate role based authentication / authorization with JWT tokens
+# Pre-processing a web request before sending to controller.
+Spring Boot project to demonstrate pre-processing a web request before sending to controller.
 
-Check below link for full instructions
-https://malindudealwis.medium.com/spring-boot-role-based-authorization-for-rest-apis-using-jwt-tokens-23dcf36fb5dd
+Follow the below steps for setting up and run the application.
+
+1. Open the application using your favourite IDE (Intellij IDEA preferred)
+2. Create a Postgres database named testdb (refer application.properties)
+3. Debug the application
+4. Check the created DB table and populate dummy data
+
+Testing
+
+Let's use an HTTP client (Postman preferred) to login to the application and to call some secured APIs.
+
+1. Login: Send an HTTP POST request putting user credentials in the body.
+    url: http://localhost:8090/api/auth/login
+    body: {"username": "malindu", "password": "password1"}
+    response: {"jwt": "example-jwt....", ...}
+    
+2. Calling secured APIs: Send an HTTP GET request .
+    url: http://localhost:8090/api/test/moderator
+    response: "Moderator Data." 
+    
+3. Debugging: Put debug pointers inside AuthenticationTokenFilter and check the flow. 
