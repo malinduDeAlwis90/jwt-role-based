@@ -20,6 +20,11 @@ public class JwtUtils {
     @Value("${app.jwtSecret}")
     private String jwtSecret;
 
+    /**
+     * Generate jwt token
+     * @param authentication the authentication
+     * @return the jwt
+     */
     public String generateJwtToken(Authentication authentication) {
         logger.info("Generating jwt token.");
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
@@ -34,10 +39,21 @@ public class JwtUtils {
         return token;
     }
 
+
+    /**
+     * Get username from jwt token
+     * @param token the jwt token
+     * @return the username
+     */
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    /**
+     * Validate a jwt token
+     * @param authToken the jwt token
+     * @return the validated boolean
+     */
     public boolean validateJwtToken(String authToken) {
         try {
             logger.info("Validating jwt token.");

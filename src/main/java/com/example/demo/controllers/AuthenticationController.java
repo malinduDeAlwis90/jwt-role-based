@@ -19,6 +19,11 @@ public class AuthenticationController {
     @Autowired
     IAuthenticationService authenticationService;
 
+    /**
+     * Login a user
+     * @param loginRequest the login request
+     * @return the jwt response
+     */
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         log.info("Incoming password login request.");
@@ -27,6 +32,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(jwtResponse);
     }
 
+    /**
+     * Register a user
+     * @param request the registration request
+     * @return the response entity
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegistrationRequest request) {
         log.info("Incoming registration request.");

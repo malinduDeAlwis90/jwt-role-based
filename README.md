@@ -6,7 +6,7 @@ Follow the below steps for setting up and run the application.
 1. Open the application using your favourite IDE (Intellij IDEA preferred)
 2. Create a Postgres database named testdb (refer application.properties)
 3. Debug the application
-4. Check the created DB table and populate dummy data
+4. Execute the file src\main\resources\initialize.sql to populate dummy db data
 
 Testing
 

@@ -33,6 +33,14 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationTokenFilter.class);
 
+    /**
+     * Filter incoming requests
+     * @param request the http servlet request
+     * @param response the http servlet response
+     * @param filterChain the filter chain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
