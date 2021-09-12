@@ -21,15 +21,17 @@ public class JwtUtils {
     private String jwtSecret;
 
     public String generateJwtToken(Authentication authentication) {
-
+        logger.info("Generating jwt token.");
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + JWT_EXPIRATION))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+        logger.info("Generating jwt token success.");
+        return token;
     }
 
     public String getUserNameFromJwtToken(String token) {
@@ -38,7 +40,9 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
+            logger.info("Validating jwt token.");
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            logger.info("Validating jwt token success.");
             return true;
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());

@@ -10,6 +10,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.security.services.blueprints.IAuthenticationService;
 import com.example.demo.security.services.blueprints.ICacheService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AuthenticationService implements IAuthenticationService {
 
@@ -46,13 +48,14 @@ public class AuthenticationService implements IAuthenticationService {
     ICacheService cacheService;
 
     public JwtResponse authenticateUser(String username, String password) {
-
+        log.info("Authentication request start processing. Authenticate with username and password.");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwtToken = jwtUtils.generateJwtToken(authentication);
 
+        log.info("Populating user details.");
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -60,6 +63,7 @@ public class AuthenticationService implements IAuthenticationService {
 
         cacheService.saveLoggedInUser(jwtToken, userRepository.findByUsername(username).get());
 
+        log.info("Authentication success. Generating response.");
         return new JwtResponse(jwtToken,
                 userDetails.getId(),
                 userDetails.getUsername(),
@@ -68,11 +72,14 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     public MessageResponse registerUser(String username, String password, String email, List<RoleEnum> inputRoles) {
+        log.info("Registration request start processing. Checking db user existence.");
         if (userRepository.existsByUsername(username)) {
+            log.info("User already available in db.");
             return null;
         }
 
         // Create a new user
+        log.info("Creating new user.");
         User user = new User(
                 username,
                 email,
@@ -91,8 +98,9 @@ public class AuthenticationService implements IAuthenticationService {
                 roles.add(role);
             });
         }
-
+        log.info("Setting roles.");
         user.setRoles(roles);
+        log.info("Saving new user to db.");
         userRepository.save(user);
 
         return new MessageResponse("User registered successfully!");

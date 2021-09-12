@@ -41,6 +41,7 @@ public class CacheService implements ICacheService {
     @Override
     public User getLoggedInUser(String key) {
         try {
+            log.info("Getting logged in user from cache.");
             return loggedInUsersCache.get(key);
         } catch (Exception e) {
             log.error("Couldn't find the value from the cache.");
